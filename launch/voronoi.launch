@@ -1,0 +1,31 @@
+<launch>
+    <!-- Run rose also using voronoi method-->
+    <node pkg="rose2" type="FeatureExtractorROSE.py" name="ROSE" output="screen">
+        ###PARAMS rose ###
+        <param name="filter" value="0.18"/>
+        <param name="pub_once" value="True"/>
+
+        ###PARAMS rose2 ###
+        <param name="pub_once2" value="False"/>
+        <param name="spatialClusteringLineSegmentsThreshold" value = "5"/>
+        #extended lines parameters
+        <param name="lines_th1" value= "0.1"/>
+        <param name="lines_distance" value="20"/>
+        # Edges parameters
+        <param name="edges_th" value="0.1"/>
+
+        #VORONOI params
+        #find more rooms with voronoi method (slower)
+        <param name="rooms_voronoi" value="True"/>
+        #filepath to store images made by voronoi method
+        <param name="filepath" value="$(find rose2)/src/rose_v2_repo/map_processing/"/>
+        <param name="voronoi_closeness" value="10"/>
+        <param name="voronoi_blur" value="8"/>
+        <param name="voronoi_iterations" value="5"/>
+    </node>
+    <node pkg="rose2" type="FeatureExtractorROSE2.py" name="ROSE2" output="screen">
+    </node>
+    ### RVIZ ###
+    <node name="rviz_player" pkg="rviz" type="rviz"
+          args="-d $(find rose2)/rviz/ROSE.rviz"/>
+</launch>
