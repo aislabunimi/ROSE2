@@ -85,7 +85,7 @@ class FeatureExtractorROSE2:
         self.publish = False # True if this node has new features to publish
 
         #SUBSCRIBER
-        rospy.Subscriber('features_ROSE', ROSEFeatures, self.processMap, queue_size=1, buff_size=2 ** 33)
+        rospy.Subscriber('features_ROSE', ROSEFeatures, self.processMap, queue_size=1, buff_size=2 ** 29)
 
         #PUBLISHERS
         self.pubFeatures = rospy.Publisher('features_ROSE2', ROSE2Features, queue_size=1)

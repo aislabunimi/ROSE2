@@ -57,7 +57,7 @@ class FeatureExtractorROSE:
         self.pubCleanMap = rospy.Publisher('clean_map', OccupancyGrid, queue_size=1)
         self.pubDirections = rospy.Publisher('direction_markers', MarkerArray, queue_size=1)
         #SUBSCRIBER
-        rospy.Subscriber('map', OccupancyGrid, self.processMap, queue_size=1, buff_size=2**33)
+        rospy.Subscriber('map', OccupancyGrid, self.processMap, queue_size=1, buff_size=2**28)
 
     def run(self):
         r = rospy.Rate(self.pubRate)
