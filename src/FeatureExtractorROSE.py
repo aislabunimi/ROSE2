@@ -3,16 +3,12 @@ import rospy
 import numpy as np
 from rose2.msg import ROSEFeatures
 from nav_msgs.msg import OccupancyGrid
-from sensor_msgs.msg import Image
 from visualization_msgs.msg import MarkerArray
 from skimage.util import img_as_ubyte
 from util import MsgUtils as mu
 from PIL import Image as ImagePIL
-from rose_v2_repo import parameters
 from rose_v1_repo.fft_structure_extraction import FFTStructureExtraction as structure_extraction
-from skimage import io
 import rose2.srv
-from matplotlib import pyplot as plt
 import warnings
 """
 Subscribers: /map (nav_msgs/OccupancyGrid)
@@ -20,13 +16,13 @@ Publishers: /features_ROSE (rose/ROSEFeatures)
             /clean_map (nav_msgs/OccupancyGrid)
             /direction_markers (visualization_msgs/MarkerArray)
 Service:    /features_roseSrv (rose2/ROSE)
-params:     /filter -> used for rose method
-            /pub_once -> publish once or consinstently
+params:     /filter -> used for rose method (real number 0 to 1, 0 keeps all the pixels)
+            /pub_once -> publish once or keep publishing at a certain rate (True or False)
             
-This node gets a map and applies rose method to it. This method is used to find the main directions of the map,
-and to filter all the non-important features of it.  (for reference look at ...)
-After computing the result rose publishes roseFeatures: main_directions, originalMap and cleanMap
-The cleanMap corresponds to the original map with non-important features filtered, that is, only what is considered to be
+This node gets a map and applies ROSE method to it. This method is used to find the main directions of the map,
+and to filter all the pixels which do not belong to the main structure.  
+After computing the result rose publishes ROSEFeatures: main_directions, originalMap and cleanMap
+The cleanMap corresponds to the original map with non-structural pixels removed, that is, only what is considered to be
 a wall or part of it is kept in the clean map.
 """
 class FeatureExtractorROSE:

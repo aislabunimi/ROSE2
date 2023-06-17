@@ -20,7 +20,6 @@ import rospy
 import rose_v1_repo.segment_handling as sh
 import rose_v1_repo.helpers as he
 
-#TODO: not working if image is too small
 def generate_line_segments_per_direction(slices):
     slices_lines = []
     for s in slices:
@@ -107,7 +106,7 @@ class FFTStructureExtraction:
         self.load_map(grid_map)
 
     def load_map(self, grid_map):
-        rospy.loginfo("[rose] Load Map.....")
+        rospy.loginfo("[ROSE] Load Map.....")
         ti = time.time()
         if len(grid_map.shape) == 3:
             grid_map = grid_map[:, :, 1]
@@ -128,17 +127,17 @@ class FFTStructureExtraction:
         square_map[:self.binary_map.shape[0], :self.binary_map.shape[1]] = self.binary_map
         self.binary_map = square_map
         self.analysed_map = self.binary_map.copy()
-        rospy.loginfo("[rose] OK ({0:.2f})".format(time.time() - ti))
+        rospy.loginfo("[ROSE] OK ({0:.2f})".format(time.time() - ti))
 
     def compute_fft(self):
-        rospy.loginfo("[rose] Compute FFT.....")
+        rospy.loginfo("[ROSE] Compute FFT.....")
         t = time.time()
         self.ft_image = np.fft.fftshift(np.fft.fft2(self.binary_map * 1))
 
         self.norm_ft_image = (np.abs(self.ft_image) / np.max(np.abs(self.ft_image))) * 255.0
         self.norm_ft_image = self.norm_ft_image.astype(int)
 
-        rospy.loginfo("[rose] OK ({0:.2f})".format(time.time() - t))
+        rospy.loginfo("[ROSE] OK ({0:.2f})".format(time.time() - t))
 
     def generate_mask(self, x1_1, y1_1, x2_1, y2_1, x1_2, y1_2, x2_2, y2_2, y_org):
         mask_1 = np.zeros(self.norm_ft_image.shape, dtype=np.uint8)
@@ -170,7 +169,7 @@ class FFTStructureExtraction:
     def process_map(self):
         self.compute_fft()
 
-        rospy.loginfo("[rose] Find Dominant directions.....")
+        rospy.loginfo("[ROSE] Find Dominant directions.....")
         t = time.time()
         self.pol, (self.rads, self.angles) = he.topolar(self.norm_ft_image, order=3)
         pol_l = self.pol.shape[1]
@@ -215,8 +214,8 @@ class FFTStructureExtraction:
             b = self.pol_h[p[1]]
             if np.abs(a - b) / amp < self.amp_tr:
                 self.comp.append(p)
-        rospy.loginfo("[rose] OK ({0:.2f})".format(time.time() - t))
-        rospy.loginfo("[rose] Found directions.....{}".format(len(self.comp)))
+        rospy.loginfo("[ROSE] OK ({0:.2f})".format(time.time() - t))
+        rospy.loginfo("[ROSE] Found directions.....{}".format(len(self.comp)))
 
         for p in self.comp:
             p0 = self.angles[p[0]]
@@ -229,7 +228,7 @@ class FFTStructureExtraction:
             p1 = np.pi - p1
             self.main_directions.append(p0)
             self.main_directions.append(p1)
-        rospy.loginfo("[rose] Score map.....")
+        rospy.loginfo("[ROSE] Score map.....")
         t = time.time()
         if not self.comp or len(self.comp) == 1:
             pass
@@ -337,7 +336,7 @@ class FFTStructureExtraction:
             mask_all = np.flipud(mask_all)
             mask_all_inv = np.ones(mask_all.shape)
             mask_all_inv[mask_all == 1] = 0
-            rospy.loginfo("[rose] OK ({0:.2f})".format(time.time() - t))
+            rospy.loginfo("[ROSE] OK ({0:.2f})".format(time.time() - t))
 
             self.mask_ft_image = self.ft_image * mask_all
             mask_iftimage = np.fft.ifft2(self.mask_ft_image)
@@ -358,16 +357,16 @@ class FFTStructureExtraction:
             self.ft_image_split = np.fft.fftshift(np.fft.fft2(self.map_split_good))
 
     def simple_filter_map(self, tr):
-        rospy.loginfo("[rose] Simple filter map.....")
+        rospy.loginfo("[ROSE] Simple filter map.....")
         t = time.time()
         l_map = np.array(np.abs(self.map_scored_good) / np.max(np.abs(self.map_scored_good)))
         self.quality_threshold = tr
         self.analysed_map = self.binary_map.copy()
         self.analysed_map[l_map < self.quality_threshold] = 0.0
-        rospy.loginfo("[rose] OK ({0:.2f})".format(time.time() - t))
+        rospy.loginfo("[ROSE] OK ({0:.2f})".format(time.time() - t))
 
     def histogram_filtering(self):
-        rospy.loginfo("[rose] Histogram filter map.....")
+        rospy.loginfo("[ROSE] Histogram filter map.....")
         t = time.time()
         pixels = np.abs(self.map_scored_good[self.binary_map > 0])
 
@@ -403,7 +402,7 @@ class FFTStructureExtraction:
 
         self.analysed_map = self.binary_map.copy()
         self.analysed_map[np.abs(self.map_scored_good) < self.cluster_quality_threshold] = 0.0
-        rospy.loginfo("[rose] OK ({0:.2f})".format(time.time() - t))
+        rospy.loginfo("[ROSE] OK ({0:.2f})".format(time.time() - t))
 
     def generate_initial_hypothesis_direction_with_kde(self, lines_long, max_len, bandwidth, cutoff_percent, cell_tr,
                                                        V):
@@ -427,7 +426,7 @@ class FFTStructureExtraction:
                                           int(round(l[1] + s)))
 
                 else:
-                    rospy.loginfo("[rose] ERROR")
+                    rospy.loginfo("[ROSE] ERROR")
 
                 rr_flag = (np.logical_or(rr < 0, rr >= self.analysed_map.shape[1]))
                 cc_flag = (np.logical_or(cc < 0, cc >= self.analysed_map.shape[0]))
@@ -495,7 +494,7 @@ class FFTStructureExtraction:
                                 elif not V:
                                     lines_hypothesis.append([l[0], l[1] + s, l[2], l[3] + s])
                                 else:
-                                    rospy.loginfo("[rose] ERROR")
+                                    rospy.loginfo("[ROSE] ERROR")
                                 kde_hypothesis.append(temp_row_full)
                                 kde_hypothesis_cut.append(temp_row_cut)
                                 new_row = False
@@ -524,7 +523,7 @@ class FFTStructureExtraction:
                                           int(round(l[1] + s)))
 
                 else:
-                    rospy.loginfo("[rose] ERROR")
+                    rospy.loginfo("[ROSE] ERROR")
 
                 rr_flag = (np.logical_or(rr < 0, rr >= self.analysed_map.shape[1]))
                 cc_flag = (np.logical_or(cc < 0, cc >= self.analysed_map.shape[0]))
@@ -598,7 +597,7 @@ class FFTStructureExtraction:
                                 elif not V:
                                     lines_hypothesis.append([l[0], l[1] + s, l[2], l[3] + s])
                                 else:
-                                    rospy.loginfo("[rose] ERROR")
+                                    rospy.loginfo("[ROSE] ERROR")
                                 kde_hypothesis.append(temp_row_full)
                                 kde_hypothesis_cut.append(temp_row_cut)
                                 new_row = False
@@ -607,7 +606,7 @@ class FFTStructureExtraction:
         return d_row_ret, slices_ids, slices, cell_hypothesis, lines_hypothesis, kde_hypothesis, kde_hypothesis_cut, slices_dir
 
     def generate_initial_hypothesis_with_kde(self):
-        rospy.loginfo("[rose] Generate initial hypothesis with kde.....")
+        rospy.loginfo("[ROSE] Generate initial hypothesis with kde.....")
         t = time.time()
         max_len = 5000
         bandwidth = 0.00005
@@ -617,10 +616,10 @@ class FFTStructureExtraction:
             self.lines_long_v, max_len, bandwidth, cutoff_percent, cell_tr, True)
         self.d_row_h, self.slices_h_ids, self.slices_h, self.cell_hypothesis_h, self.lines_hypothesis_h, self.scored_hypothesis_h, self.scored_hypothesis_h_cut, self.slices_h_dir = self.generate_initial_hypothesis_direction_with_kde(
             self.lines_long_h, max_len, bandwidth, cutoff_percent, cell_tr, False)
-        rospy.loginfo("[rose] OK ({0:.2f})".format(time.time() - t))
+        rospy.loginfo("[ROSE] OK ({0:.2f})".format(time.time() - t))
 
     def generate_initial_hypothesis_simple(self):
-        rospy.loginfo("[rose] Generate initial hypothesis simple.....")
+        rospy.loginfo("[ROSE] Generate initial hypothesis simple.....")
         t = time.time()
         max_len = 5000
         padding = 1
@@ -630,10 +629,10 @@ class FFTStructureExtraction:
             self.lines_long_v, max_len, padding, cell_tr, True)
         self.d_row_h, self.slices_h_ids, self.slices_h, self.cell_hypothesis_h, self.lines_hypothesis_h, self.scored_hypothesis_h, self.scored_hypothesis_h_cut, self.slices_h_dir = self.generate_initial_hypothesis_direction_simple(
             self.lines_long_h, max_len, padding, cell_tr, False)
-        rospy.loginfo("[rose] OK ({0:.2f})".format(time.time() - t))
+        rospy.loginfo("[ROSE] OK ({0:.2f})".format(time.time() - t))
 
     def find_walls_flood_filing(self):
-        rospy.loginfo("[rose] Find Walls with flood filing.....")
+        rospy.loginfo("[ROSE] Find Walls with flood filing.....")
         t = time.time()
         self.labeled_map = np.zeros(self.binary_map.shape)
         id = 2
@@ -738,10 +737,10 @@ class FFTStructureExtraction:
                 self.all_lines.append(((X1, Y1), (X2, Y2)))
             self.segments_h_mbb_lines.append(local_mbb_lines)
         self.all_lines = list(dict.fromkeys(self.all_lines))
-        rospy.loginfo("[rose] OK ({0:.2f})".format(time.time() - t))
+        rospy.loginfo("[ROSE] OK ({0:.2f})".format(time.time() - t))
 
     def find_walls_with_line_segments(self):
-        rospy.loginfo("[rose] Find Walls with line segment clustering.....")
+        rospy.loginfo("[ROSE] Find Walls with line segment clustering.....")
         t = time.time()
         eps = 10
         min_samples = 2
@@ -781,16 +780,16 @@ class FFTStructureExtraction:
                 temp_map[s[0]][s[1]] = id
             last_label = label
         self.labeled_map_line_segment = temp_map
-        rospy.loginfo("[rose] OK ({0:.2f})".format(time.time() - t))
+        rospy.loginfo("[ROSE] OK ({0:.2f})".format(time.time() - t))
 
     # output
     ###########################
     def report(self):
         for p in self.comp:
-            rospy.loginfo("[rose] dir:", self.angles[p[0]] * 180.0 / np.pi, self.angles[p[1]] * 180.0 / np.pi)
+            rospy.loginfo("[ROSE] dir:", self.angles[p[0]] * 180.0 / np.pi, self.angles[p[1]] * 180.0 / np.pi)
 
     def show(self, visualisation, path, shape, format='.png'):
-        rospy.loginfo("[rose] Generating visualisation.....")
+        rospy.loginfo("[ROSE] Generating visualisation.....")
         t = time.time()
 
         if visualisation["Binary map"]:
@@ -1242,4 +1241,4 @@ class FFTStructureExtraction:
             title = os.path.join(path, name + format)
             plt.savefig(title)
 
-        rospy.loginfo("[rose] OK ({0:.2f})".format(time.time() - t))
+        rospy.loginfo("[ROSE] OK ({0:.2f})".format(time.time() - t))
