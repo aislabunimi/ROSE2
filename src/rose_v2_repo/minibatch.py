@@ -153,7 +153,6 @@ class Minibatch:
         # this is needed in order to maintain the extended lines of the offset STANDARD
         border_lines = lay.set_weight_offset(extended_segments_merged, xmax, xmin, ymax, ymin)
         self.extended_segments_th1_merged, ex_li_removed = sg.remove_less_representatives(extended_segments_merged, param_obj.th1)
-
         lis = []
         for line in ex_li_removed:
             short_line = sg.create_short_ex_lines(line, walls, size, self.extended_segments_th1_merged)
@@ -164,7 +163,10 @@ class Minibatch:
         lis, _ = sg.remove_less_representatives(lis, 0.1)
         for el in lis:
             self.extended_segments_th1_merged.append(el)
-
+        #threshold lines (added)
+        for e in self.extended_segments_th1_merged:
+            if(e.weight < param_obj.th1):
+                self.extended_segments_th1_merged.remove(e)
 
         # -------------------------------------------------------------------------------------
 
@@ -182,7 +184,10 @@ class Minibatch:
 
         edges = sg.set_weights(edges, walls)
         self.edges_th1 = sg.set_weights(self.edges_th1, walls)
-
+        # threshold edges (added)
+        for e in self.edges_th1:
+            if (e.weight < param_obj.threshold_edges):
+                self.edges_th1.remove(e)
         # -------------------------------------------------------------------------------------
 
         # ----------------------------1.9_CREATE CELLS-----------------------------------------
