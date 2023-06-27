@@ -9,10 +9,10 @@
         <param name="/pub_once2" value="False"/>
         <param name="/spatialClusteringLineSegmentsThreshold" value = "5"/>
         #extended lines parameters
-        <param name="/lines_th1" value= "0.1"/>
+        <param name="/lines_th1" value= "0.0"/> #0 to 1 where 0 keeps all the lines
         <param name="/lines_distance" value="20"/>
         # Edges parameters
-        <param name="/edges_th" value="0.1"/>
+        <param name="/edges_th" value="0.0"/> #0 to 1 where 0 keeps all the edges
 
         #VORONOI params
         #find more rooms with voronoi method (slower)

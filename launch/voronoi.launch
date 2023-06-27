@@ -9,17 +9,17 @@
         <param name="pub_once2" value="False"/>
         <param name="spatialClusteringLineSegmentsThreshold" value = "5"/>
         #extended lines parameters
-        <param name="lines_th1" value= "0.1"/>
+        <param name="lines_th1" value= "0.0"/> #0 to 1 where 0 keeps all the lines
         <param name="lines_distance" value="20"/>
         # Edges parameters
-        <param name="edges_th" value="0.1"/>
+        <param name="edges_th" value="0.0"/> #0 to 1 where 0 keeps all the edges
 
         #VORONOI params
         #find more rooms with voronoi method (slower)
         <param name="rooms_voronoi" value="True"/>
         #filepath to store images made by voronoi method
         <param name="filepath" value="$(find rose2)/src/rose_v2_repo/map_processing/"/>
-        <param name="voronoi_closeness" value="10"/>
+        <param name="voronoi_closeness" value="2"/>
         <param name="voronoi_blur" value="8"/>
         <param name="voronoi_iterations" value="5"/>
     </node>

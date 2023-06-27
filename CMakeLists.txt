@@ -7,7 +7,14 @@ project(rose2)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs tf)
+find_package(catkin REQUIRED COMPONENTS 
+	roscpp 
+	rospy 
+	std_msgs 
+        nav_msgs
+        visualization_msgs
+        geometry_msgs
+        message_generation)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -34,12 +41,6 @@ find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs tf)
 ##     * add a exec_depend tag for "message_runtime"
 ## * In this file (CMakeLists.txt):
 ##   * add "message_generation" and every package in MSG_DEP_SET to
-       find_package(catkin REQUIRED COMPONENTS
-       std_msgs
-       nav_msgs
-       visualization_msgs
-       geometry_msgs
-       message_generation)
 ##   * add "message_runtime" and every package in MSG_DEP_SET to
        ##catkin_package(CATKIN_DEPENDS message_runtime)
 ##   * uncomment the add_*_files sections below as needed
@@ -80,7 +81,7 @@ find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs tf)
    nav_msgs
    visualization_msgs
    geometry_msgs
-   rose2
+  
  )
 
 ################################################
@@ -127,7 +128,7 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
 # include
-# ${catkin_INCLUDE_DIRS}
+ ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
